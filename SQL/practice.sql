@@ -169,3 +169,270 @@ ORDER BY students.student_id;
 SELECT * FROM students
 WHERE students.student_id <= 7
 ORDER BY students.last_name, students.first_name;
+
+
+-- SQL Queries from the Microsoft Certified: Power BI Data Analyst Associate
+-- Selecting and importing every column from the SALES table
+SELECT * FROM SALES;
+
+-- Select ID, NAME, SALESAMOUNT from the SALES table
+SELECT ID, NAME, SALESAMOUNT FROM SALES;
+
+-- Select ID, NAME, SALESAMOUNT from the SALES table BUT only the data after the date January 1st 2020 and ordered by the date
+SELECT ID, NAME, SALESAMOUNT FROM SALES
+WHERE OrderDate >= '1/1/2020'
+ORDER BY OrderDate;
+
+-- Instead of selecting normally as
+SELECT CustomerPostalCode FROM Sales.Customer;
+-- And potentially having a data type error
+-- you can type cast the SQL query to eliminate the possibility of data source errors
+
+SELECT CAST (CustomerPostalCode as varchar(10)) FROM Sales.Customer;
+
+
+
+/*
+    An example query for practicing JOIN clauses in SQL
+
+    Notice that the "CustomerID" column in the "Orders" table refers to the
+    "CustomerID" column in the "Customers" table.
+
+    Both tables share a relationship w.r.t. to the "CustomerID" column
+ */
+
+CREATE TABLE Orders
+(
+    OrderID INTEGER NOT NULL,
+    CustomerID INTEGER NOT NULL,
+    OrderDate DATE NOT NULL,
+    ShipperID INTEGER NOT NULL,
+    EmployeeID INTEGER NOT NULL,
+    PRIMARY KEY(CustomerID)
+);
+
+INSERT INTO Orders(OrderID, CustomerID, OrderDate)
+VALUES
+(10308, 2, '1996-09-18', 3, 7),
+(10309, 37, '1996-09-19', 1, 3),
+(10310, 77, '1996-09-20', 2, 8);
+
+
+CREATE TABLE Customers
+(
+    CustomerID INTEGER NOT NULL AUTO_INCREMENT,
+    CustomerName VARCHAR(100) NOT NULL,
+    ContactName VARCHAR(30) NOT NULL,
+    Country VARCHAR(15),
+    PostalCode INTEGER(50) NOT NULL,
+    PRIMARY KEY(CustomerID)
+);
+
+INSERT INTO Customers(CustomerID, CustomerName, ContactName, Country)
+VALUES
+(1, 'Alfreds Futterkiste', 'Maria Anders', 'Germany', 12209),
+(2, 'Ana Trujilo Emparedados y helados', 'Ana Trujilo', 'Mexico', 05021),
+(3, 'Antonio Moreno Taqueria', 'Antonio Moreno', 'Mexico', 05023);
+
+-- A more complicated SQL query involving JOIN and ON clauses - aswell as renaming columns into specific names using 'as'
+-- SQL Notes:
+/*
+    JOIN Clause
+    used to combine rows from two or more tables, based on a related column between them
+
+    INNER JOIN clause
+    e.g., selecting records that have matching values in both tables
+ */
+
+-- (INNER) JOIN - returns records that HAVE MATCHING VALUES IN BOTH TABLES:
+SELECT Orders.OrderID, Customers.CustomerName, Orders.OrderDate -- THis will be the query data, e.g., column1 = Order ID, column2 = Customer Name, column3 = Order Date
+FROM Orders
+INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+-- This will return (10308, Ana Trujilo... , 1996-09-18)
+-- This has found a matched values based on the same CustomerIDs on both tables
+
+SELECT * FROM Orders
+INNER JOIN Customers ON Orders.CustomerID = Customers.CustomerID;
+
+
+SELECT TOP 20 pc.Name as CategoryName
+, p.name as ProductName
+FROM SalesLT.ProductCategory pc
+INNER JOIN SalesLT.Product p
+ON pc.productcategoryid = p.productcategoryid;
+
+
+SELECT ord.OrderDate as OrderDate
+, cst.Country as OrderOriginCountry
+WHERE ord.OrderDate >= '1/1/2021'
+FROM Orders ord
+INNER JOIN Customers cst
+ON ord.CustomerID = cst.CustomerID
+ORDER BY OrderDate;
+
+
+
+/*
+LEFT (OUTER) JOIN - returns ALL RECORDS FROM THE LEFT TABLE (table1), and the MATCHED RECORDS FROM THE RIGHT TABLE (table2),
+The result is 0 RECORDS from the right side IF THERE ARE NO MATCHES
+
+General syntax:
+ */
+SELECT column_name(s)
+FROM table_1
+LEFT JOIN table_2
+ON table_1.column_name = table_2.column_name;
+-- Note: LEFT JOIN returns ALL RECORDS FROM THE LEFT table (Customers), even if THERE ARE NO MATCHES in the RIGHT TABLE (Orders)
+
+SELECT cst.CustomerName as CustomerName
+, ord.OrderID
+FROM Customers cst
+LEFT JOIN Orders ord
+ON cst.CustomerID = ord.CustomerID
+ORDER BY cst.CustomerName;
+
+-- Another example: select all customers, and any orders they might have:
+
+SELECT cst.CustomerName as CustomerName
+, ord.OrderID as OrderID
+, ord.OrderDate as OrderDate
+FROM Customers cst
+LEFT JOIN Orders ord
+ON cst.CustomerID = ord.CustomerID
+ORDER BY cst.CustomerName;
+-- All customers (table_1) will be kept whereas only matches for the customerID from the orders (table_2) table will be kept.
+
+
+
+/*
+RIGHT (OUTER) JOIN - returns ALL RECORDS FROM THE RIGHT TABLE (table_2), and the MATCHED RECORDS FROM THE LEFT TABLE (table_1)
+The result is 0 RECORDS from the left side, IF THERE ARE NO MATCHES
+
+Note that RIGHT JOIN can also be called RIGHT OUTER JOIN in some databases
+
+General syntax:
+ */
+SELECT column_name(s)
+FROM table_1
+RIGHT JOIN table_2
+ON table_1.column_name = table_2.column_name;
+-- Note: RIGHT JOIN returns ALL RECORDS FROM THE RIGHT table (Employees), even if THERE ARE NO MATCHES in the LEFT TABLE (Customers)
+
+-- an example case, (this wouldn't work with the created database above)
+-- the following statement will return all employees (all table_2 - right values), and any orders (matched table_1 - left values) they might have placed
+SELECT ord.OrderID as OrderID
+, emp.EmployeeID as EmployeeID
+, ord.OrderDate as OrderDate
+, emp.LastName as EmployeeLastName
+, emp.FirstName as EmployeeFirstName
+FROM Orders ord
+RIGHT JOIN Employees emp
+ON ord.EmployeeID = emp.EmployeeID
+ORDER BY emp.EmployeeID;
+
+
+
+/*
+FULL (OUTER) JOIN - returns ALL RECORDS when there is a MATCH IN EITHER LEFT (table_1) OR RIGHT TABLE (table_2) records
+
+Note: FULL OUTER JOIN and FULL JOIN are the same
+
+Note: FULL OUTER JOIN can return VERY LARGE datasets
+
+FULL OUTER JOIn returns ALL MATCHING RECORDS from BOTH TABLES whether the other table matches or not. In essence, everything is getting posted regardless of present matches
+
+General syntax:
+ */
+SELECT column_name(s)
+FROM table_1
+FULL OUTER JOIN table_2
+ON table_1.column_name = table_2.column_name
+WHERE condition;
+
+
+-- an example case, (this wouldn't work with the created database above)
+-- the following statement selects all customers and all orders for all orders numbered 1500 and higher
+SELECT cst.CustomerName as CustomerName
+, ord.OrderID as OrderID
+FROM Orders ord
+FULL OUTER JOIN Customers cst
+ON ord.CustomerID = cst.CustomerID
+WHERE ord.OrderID >= 1500;
+
+
+
+
+-- A more complex SQL query with the AdventureWorks Dataset on the Azure SQL Server
+SELECT p.ProductID as ProductID
+, p.Name as ProductName
+, p.ProductCategoryID as ProductCategory
+, odt.OrderQty as OrderQuantity
+, odt.UnitPrice as IndividualUnitPrice
+, odt.ModifiedDate as OrderDate
+FROM SalesLT.Product p
+JOIN SalesLT.SalesOrderDetail odt
+ON p.ProductID = odt.ProductID
+WHERE odt.ModifiedDate > '2008-01-01'
+ORDER BY p.ProductID;
+
+
+
+
+
+
+
+
+
+
+
+-- These queries are meant to be used with the `PopSQL Sample Data` connection through the PopSQL Application
+-- Bar chart
+select
+    country_code,
+    count(1)
+from
+    city
+group by
+    1
+limit
+    10;
+
+-- Scatter chart
+select
+    indep_year,
+    count(1)
+from
+    country
+where
+    indep_year > 1800
+group by
+    1;
+
+-- Line chart
+with
+    hours as (
+        select
+            generate_series(
+                date_trunc('hour', now()) - '1 day' :: interval,
+                date_trunc('hour', now()),
+                '1 hour' :: interval
+            ) as hour
+    )
+select
+    hours.hour,
+    random() * 1000 as metric
+from
+    hours;
+
+-- Other queries
+select
+    *
+from
+    country;
+
+select
+    *
+from
+    city
+where
+    country_code = 'USA';
