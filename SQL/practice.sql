@@ -158,6 +158,10 @@ WHERE students.first_name = 'Sheen' AND students.last_name = 'Estevez';
 
 -- Basic Queries (Simple Select, Where, and Order By clauses and arguments)
 -- Querying for entries in the table
+/*
+ORDER BY keyword
+The SQL keyword used to sort the result-set
+ */
 SELECT * FROM students
 WHERE students.major IN ('Computer Science', 'Biology', 'Gender Studies') AND students.name IN ('Greg', 'Jason', 'Javid')
 ORDER BY students.name, students.student_id;
@@ -169,6 +173,53 @@ ORDER BY students.student_id;
 SELECT * FROM students
 WHERE students.student_id <= 7
 ORDER BY students.last_name, students.first_name;
+
+-- select a column named "FirstName" from a table named "Persons"
+SELECT FirstName FROM Persons
+
+-- select all the records from a table named "Persons" where the value of the column "FirstName" is "Peter"
+SELECT * FROM Persons
+WHERE FirstName = "Peter";
+
+-- select all the records from a table named "Persons" where the value of the column "FirstName" starts with an "a"
+SELECT * FROM Persons
+Where FirstName LIKE "A%";
+
+-- select all the records from a table named "Persons" where the "FirstName" is "Peter" and the "LastName" is "Jackson"
+SELECT * FROM Persons
+WHERE FirstName = "Peter" AND LastName = "Jackson";
+
+-- select all the records from a table named "Persons" where the "LastName" is alphabetically between (and including) "Hansen" and "Pettersen"
+SELECT * FROM Persons
+WHERE LastName BETWEEN "Hansen" AND "Pettersen";
+
+-- write an SQL statement that is used to return only different values
+SELECT DISTINCT;
+
+-- how can you return all the records from a table named "Persons" sorted descending by "FirstName"
+-- Sort by descending includes adding a DESC at the end of the ORDER BY clause
+SELECT * FROM Persons
+ORDER BY FirstName DESC;
+
+-- how can you insert "Olsen" as the "LastName" in the "Persons" table
+INSERT INTO Persons (LastName) VALUES ("Olsen");
+
+-- change "Hansen" into "Nilsen" in the "LastName" column in the Persons table
+UPDATE Persons
+SET LastName = "Hansen"
+WHERE LastName = "Nilsen";
+
+-- how can you delete the records where the "FirstName" is "Peter" in the Persons Table
+DELETE FROM Persons
+WHERE FirstName = "Peter";
+
+-- how can you return the number of records in the "Persons" table
+SELECT COUNT(*) FROM Persons;
+
+-- which operator is used to select values within a range
+BETWEEN
+
+
 
 
 -- SQL Queries from the Microsoft Certified: Power BI Data Analyst Associate
@@ -339,7 +390,7 @@ Note: FULL OUTER JOIN and FULL JOIN are the same
 
 Note: FULL OUTER JOIN can return VERY LARGE datasets
 
-FULL OUTER JOIn returns ALL MATCHING RECORDS from BOTH TABLES whether the other table matches or not. In essence, everything is getting posted regardless of present matches
+FULL OUTER JOIN returns ALL MATCHING RECORDS from BOTH TABLES whether the other table matches or not. In essence, everything is getting posted regardless of present matches
 
 General syntax:
  */
@@ -360,8 +411,6 @@ ON ord.CustomerID = cst.CustomerID
 WHERE ord.OrderID >= 1500;
 
 
-
-
 -- A more complex SQL query with the AdventureWorks Dataset on the Azure SQL Server
 SELECT p.ProductID as ProductID
 , p.Name as ProductName
@@ -370,19 +419,69 @@ SELECT p.ProductID as ProductID
 , odt.UnitPrice as IndividualUnitPrice
 , odt.ModifiedDate as OrderDate
 FROM SalesLT.Product p
-JOIN SalesLT.SalesOrderDetail odt
+INNER JOIN SalesLT.SalesOrderDetail odt
 ON p.ProductID = odt.ProductID
 WHERE odt.ModifiedDate > '2008-01-01'
 ORDER BY p.ProductID;
 
+/*
+UNION operator
+used to combine the result-set of two or more SELECT statements
+
+NOTE THAT
+    Every SELECT statement within UNION must have the same number of columns
+    The columns must also have similar data types
+    The columns in every SELECT statement must also be in the same order
+ 
+
+UNION operator selects only distinct values by default
+EXAMPLE SYNTAX CODE
+ */
+SELECT column_name(s) FROM table_1
+UNION
+SELECT column_name(s) FROM table_2;
+
+-- The following SQL statement (using UNION) returns the cities (only distinct values) from both the "Customers" and the "Suppliers" table
+SELECT City FROM Customers cst
+UNION
+SELECT City FROM Suppliers spl
+ORDER BY City;
+-- Note: If some customers/suppliers HAVE THE SAME CITY, each city will only be listed once
+--                          this is because UNION selects ONLY distinct values
+--       Use UNION ALL to also select duplicate values
+
+
+/*
+UNION ALL operator
+
+to allow duplicate values, when combining the result-set of two or more SELECT statements
+ */
+SELECT column_name(s) FROM table_1
+UNION ALL
+SELECT column_name(s) FROM table_2;
+
+-- NOTE: The column names in the result-set are usually equal to the column name in the first SELECT statement
+
+-- The following SQL statement returns the cities (only distinct values) from BOTH the "Customers" and the "Suppliers" table
+SELECT City FROM Customers cst
+UNION ALL
+SELECT City FROM Suppliers spl
+ORDER BY City;
 
 
 
-
-
-
-
-
+-- the following statement selects all customers and all orders for all order IDs numbered 1500 and higher
+SELECT CAST (cst.CustomerID as INTEGER()) as CustomerID
+, CAST (cst.FirstName as varchar(20)) as FirstName
+, CAST (cst.LastName as varchar(25)) as LastName
+, ord.OrderID as OrderID
+, ord.Date as OrderDate
+, ord.Country as OrderCountry
+FROM Customers cst
+FULL OUTER JOIN Orders ord
+ON cst.CustomerID = ord.CustomerID
+WHERE EXISTS (cst.OrderID >= 1500)
+ORDER BY cst.LastName;
 
 
 -- These queries are meant to be used with the `PopSQL Sample Data` connection through the PopSQL Application

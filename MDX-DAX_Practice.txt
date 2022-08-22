@@ -1,0 +1,46 @@
+Data Analysis Expressions (DAX) - Data Analytics:
+
+- Quantity of Orders YTD = TOTALYTD(SUM('Sales'[OrderQty]), 'Sales'[OrderDate])
+
+- CALENDER or CALENDERAUTO()
+    - Calendar Table
+    - Can be used to visualize data from each table using a single visual
+    - Creates a dimension table that contains a list of dates - one for every day of the calender of fiscal years
+
+    - CALENDARAUTO([FiscalYearEndMonth])
+        bases the START and END date on the MINIMUM and MAXIMUM dates across the entire model
+        EXCEPT for DATES THAT ARE CALCULATED BY GENERATED COLUMNS OR TABLES OR MEASURES
+
+        returns a table with a column of dates - one for each date in the date range
+
+        ALWAYS starts with the FIRST DAY OF THE CALENDAR/FISCAL YEAR (e.g., 1/1/2020)
+        ENDS on the LAST DAY OF THE CALENDARA/FISCAL YEAR (e.g., 31/12/2020)
+
+- The columns for just the year
+	Year = Year(Dates[Date])
+
+- The month number
+	Month Number = MONTH(Dates[Date])
+
+- The week of the year
+	Week Number = WEEKNUM(Dates[Date])
+
+- The day of the week
+	DayOfTheWeek = FORMAT(Dates[Date], “DDDD”)
+
+- RELATED() and RELATEDTABLE() functions
+	- RELATEDTABLE()
+		a shortcut for CALCULATETABLE() function with no logical expressions
+	- CALCULATETABLE()
+		evaluates a table expression in a modified filter context and
+		returns a table of values
+
+
+    
+
+Multi-Dimensional Expressions (MDX)
+
+
+
+
+Power Query M - Used for ingestion and data wrangling
